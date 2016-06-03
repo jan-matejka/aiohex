@@ -4,3 +4,13 @@
    contain the root `toctree` directive.
 
 .. include:: ../README.rst
+
+.. toctree::
+   :maxdepth: 2
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

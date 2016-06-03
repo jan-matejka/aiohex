@@ -6,6 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = python3 $(shell which sphinx-build)
 PAPER         =
 BUILDDIR      = _build
+APIDIR        = ./api
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -47,9 +48,15 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
+	$(RM) -r $(APIDIR)
+
+.PHONY: api
+api:
+
+	sphinx-apidoc --private --force ../aiohex -o $(APIDIR)
 
 .PHONY: html
-html:
+html: api
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
