@@ -19,6 +19,8 @@ setup(
 , install_requires = [
     "setuptools"
   , "aiohttp"
+  , "aiopg"
+  , "sqlalchemy"
   ]
 
 , entry_points = {

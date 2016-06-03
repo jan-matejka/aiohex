@@ -3,6 +3,7 @@ import asyncio
 import sys
 
 from aiohttp import web
+from . import model
 
 __version__ = '0.1.0'
 
@@ -37,8 +38,19 @@ async def root_view(r):
   raise web.HTTPFound('/1')
 
 def main():
+  dsn = "postgresql://localhost/aiohex"
+
+  # setup db
+  model.create_tables(dsn)
+  engine = asyncio.get_event_loop() \
+    .run_until_complete(model.create_engine(dsn))
+
+  # setup web app
   app = web.Application()
   app.router.add_route('GET', '/'    , root_view)
   app.router.add_route('GET', '/{pn}', page_view)
+  app['db'] = engine
+
+  # run
   web.run_app(app)
   sys.exit(0)
