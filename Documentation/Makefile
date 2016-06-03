@@ -7,6 +7,8 @@ SPHINXBUILD   = python3 $(shell which sphinx-build)
 PAPER         =
 BUILDDIR      = _build
 APIDIR        = ./api
+MODULES       = aiohex.model aiohex.session
+# FIXME:: autogenerate MODULES
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -53,7 +55,7 @@ clean:
 .PHONY: api
 api:
 
-	sphinx-apidoc --private --force ../aiohex -o $(APIDIR)
+	sphinx-apidoc --private --force ../aiohex $(MODULES) -o $(APIDIR)
 
 .PHONY: html
 html: api

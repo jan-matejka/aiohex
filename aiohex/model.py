@@ -20,6 +20,11 @@ hits = sa.Table(
 , sa.Column('page_no', sa.Integer, nullable = False)
 )
 
+class DSN(str):
+  """
+  Postgresql Connection URI. See https://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41223
+  """
+
 def create_tables(*args, **kwargs):
   """
   Connects to postgresql instance identified by `dsn` and creates all
@@ -29,8 +34,8 @@ def create_tables(*args, **kwargs):
   function creates the SQLAlchemy Engine to run the CREATE TABLES and
   then disposes of it.
 
-  :param dsn: Postgresql Connection URI. See https://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41223
-  :type  dsn: str
+  :param dsn:
+  :type  dsn: DSN
   """
 
   e = sa.create_engine(*args, **kwargs)
