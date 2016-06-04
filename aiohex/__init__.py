@@ -31,6 +31,15 @@ async def page_view(r):
   except ValueError:
     raise web.HTTPNotFound
 
+  peer = r.transport.get_extra_info('peername')
+  await model.register_hit(
+    r.app['db']
+  , pn
+  , r['session'].id
+  , peer[0]
+  , peer[1]
+  , dict(r.headers)
+  )
   return web.Response(body = create_body(pn))
 
 async def root_view(r):

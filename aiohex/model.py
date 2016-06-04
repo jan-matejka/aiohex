@@ -9,6 +9,7 @@ import io
 import sys
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql as pgdia
 from aiopg.sa import create_engine
 
 metadata = sa.MetaData()
@@ -16,9 +17,53 @@ metadata = sa.MetaData()
 hits = sa.Table(
   'hits'
 , metadata
-, sa.Column('id', sa.Integer, primary_key = True)
-, sa.Column('page_no', sa.Integer, nullable = False)
+, sa.Column('id'        , sa.Integer      , primary_key = True)
+, sa.Column('page_no'   , sa.Integer      , nullable = False)
+, sa.Column('session_id', pgdia.UUID(True), nullable = False)
+, sa.Column('ip'        , pgdia.INET      , nullable = False)
+, sa.Column('socket'    , sa.Integer      , nullable = False)
+, sa.Column('headers'   , sa.Text         , nullable = False)
 )
+# TODO: use more reasonable format for headers
+# TODO: more browser fingerprinting.
+#       http://anoncheck.security-portal.cz/ is a good reference for
+#       starters
+#       and here probably are further hints
+#       https://panopticlick.eff.org/about#methodology
+
+async def register_hit(engine, page_no, session_id, ip, socket, headers):
+  """
+  :param engine:
+  :type  engine: aiopg.sa.Engine
+
+  :param page_no:
+  :type  page_no: int
+
+  :param session_id:
+  :type  session_id: uuid.UUID
+
+  :param ip:
+  :type  ip: str
+
+  :param socket:
+  :type  socket: int
+
+  :param headers:
+  :type  headers: dict
+
+  :rtype: None
+  """
+
+  q = hits.insert().values(
+    page_no    = page_no
+  , session_id = session_id
+  , ip         = ip
+  , socket     = socket
+  , headers    = str(headers)
+  )
+
+  async with engine.acquire() as conn:
+    await conn.execute(q)
 
 class DSN(str):
   """
