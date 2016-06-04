@@ -14,3 +14,8 @@ doc:
 clean:
 
 	$(DOCMAKE) clean
+
+.PHONY: check
+check:
+
+	python $(shell which py.test) -v

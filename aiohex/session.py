@@ -23,13 +23,13 @@ storage and UUID4 as session ID.
 
 import uuid
 
-def create_middleware_factory(cc):
+def create_middleware_factory(cc, uuid_factory = uuid.uuid4):
   """
   :param cc:
   :type  cc: CookieConfig
   """
   async def factory(app, handler):
-    cs = _CookieStore(cc, app)
+    cs = _CookieStore(cc, app, uuid_factory)
     async def middleware(r):
       """
       :param r:
@@ -79,15 +79,21 @@ class CookieConfig():
     return cc._params
 
 class _CookieStore:
+  """
+  .. todo::
+
+    this might work nicer as context manager inside the middleware
+  """
   _store_key = 'session_store'
 
-  def __init__(cs, cc, app):
+  def __init__(cs, cc, app, uuid_factory):
     """
     :param cc:
     :type  cc: CookieConfig
     """
     cs._config = cc
     cs._app = app
+    cs._create_uuid = uuid_factory
 
   def get_session(cs, request):
     """
@@ -98,13 +104,15 @@ class _CookieStore:
     """
     cookie = cs._get_cookie(request)
 
-    if not cookie in cs._get_store():
+    if cookie not in cs._get_store():
       # cookie is either new or was forgotten by the session store
       # (due to server restart)
-      cs._get_store()[cookie] = Session(cookie)
+      cookie = cs._create_uuid()
 
-    cs._cookie = cookie
     # remember the cookie, so it can be written to the response
+    cs._cookie = cookie
+
+    cs._get_store()[cookie] = Session(cookie)
     return cs._get_store()[cookie]
 
   def set_cookie(cs, response):
@@ -137,9 +145,12 @@ class _CookieStore:
     """
     cookie = request.cookies.get(cs._config.name)
     if cookie is None:
-      return uuid.uuid4()
-    else:
+      return None
+
+    try:
       return uuid.UUID("{{{}}}".format(cookie))
+    except ValueError:
+      return None
 
 class Session():
   def __init__(s, id_):
