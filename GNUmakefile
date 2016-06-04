@@ -1,7 +1,11 @@
 .DEFAULT_GOAL := build
 
+PKGNAME = aiohex
+
 DOCDIR = ./Documentation
 DOCMAKE = $(MAKE) -C $(DOCDIR)
+
+TESTDIR = ./tests
 
 build:
 
@@ -18,4 +22,4 @@ clean:
 .PHONY: check
 check:
 
-	python $(shell which py.test) -v
+	python $(shell which py.test) -v --doctest-modules $(PKGNAME) $(TESTDIR)

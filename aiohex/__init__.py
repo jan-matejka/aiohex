@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+import argparse
 import asyncio
+import itertools
 import sys
 
 from aiohttp import web
 
 from . import model
 from . import session
+from . import markov
 
 __version__ = '0.1.0'
 
@@ -83,10 +86,25 @@ class Config:
 def main():
   c = Config()
 
-  # setup db
-  model.create_tables(c.dsn)
-  engine = asyncio.get_event_loop() \
-    .run_until_complete(model.create_engine(c.dsn))
+  p = argparse.ArgumentParser(description = 'Example aiohttp web app')
+  sub = p.add_subparsers(dest = 'command')
+  sub.add_parser("serve", help = serve.__doc__)
+  sub.add_parser("transitions", help = transitions.__doc__)
+
+  args = p.parse_args(sys.argv[1:])
+
+  dispatch = dict(
+    serve       = serve
+  , transitions = transitions
+  )
+
+  sys.exit(dispatch[args.command](args))
+
+def serve(args):
+  """
+  Start HTTP server
+  """
+  c = Config()
 
   # setup session management
   app = web.Application(middlewares = [
@@ -96,8 +114,26 @@ def main():
   # setup url routing
   app.router.add_route('GET', '/'    , root_view)
   app.router.add_route('GET', '/{pn}', page_view)
-  app['db'] = engine
+  app['db'] = model.connect(c.dsn)
 
   # run
   web.run_app(app)
-  sys.exit(0)
+  return 0
+
+def transitions(args):
+  """
+  Display page transitions graph
+  """
+  c = Config()
+  e = model.connect(c.dsn)
+
+  exit_state = 0
+  tgs = asyncio.get_event_loop().run_until_complete(
+    model.get_transitions(e, exit_state)
+  )
+
+  for sid, tg in tgs.items():
+    print("Transitions for session {}:".format(sid))
+    tg.compute_probabilities()
+    for i in range(1,4):
+      tg.draw_transitions(i)

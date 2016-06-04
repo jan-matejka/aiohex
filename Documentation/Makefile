@@ -7,7 +7,7 @@ SPHINXBUILD   = python3 $(shell which sphinx-build)
 PAPER         =
 BUILDDIR      = _build
 APIDIR        = ./api
-MODULES       = aiohex.model aiohex.session
+MODULES       = aiohex.model aiohex.session aiohex.markov
 # FIXME:: autogenerate MODULES
 
 # Internal variables.

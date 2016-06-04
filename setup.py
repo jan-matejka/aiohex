@@ -21,6 +21,8 @@ setup(
   , "aiohttp"
   , "aiopg"
   , "sqlalchemy"
+  , "networkx"
+  , "numpy"
   ]
 
 , entry_points = {
