@@ -25,6 +25,13 @@ setup(
   , "numpy"
   ]
 
+, tests_require = [
+    "pytest"
+  , "nose"
+  , "cram"
+  # zsh
+  ]
+
 , entry_points = {
     'console_scripts': ['aiohex = aiohex:main']
   }

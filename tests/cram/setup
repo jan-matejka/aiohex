@@ -1,0 +1,17 @@
+TESTCONFIG=$TESTDIR/config
+
+aiohex() {
+  aiohex-nc -c $TESTCONFIG "$@"
+}
+
+aiohex-nc() {
+  $TESTDIR/../../aiohex.py "$@"
+}
+
+sid() {
+  # http://stackoverflow.com/questions/5349718/how-can-i-repeat-a-character-in-bash
+  local id=$1 # string session id in hex
+  local pad=$(( 12 - ${#id} ))
+  pad=$(printf "0%.0s" {1..$pad})
+  printf "00000000-0000-0000-0000-%s%s" $pad $id
+}

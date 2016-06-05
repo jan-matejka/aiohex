@@ -4,9 +4,11 @@
 Markov chains helpers
 """
 
+import functools
+import itertools
 import networkx as nx
 import numpy as np
-import itertools
+import re
 
 # I don't have a math degree but I know a markov chain when I see one.
 
@@ -92,7 +94,6 @@ class Graph(nx.DiGraph):
   def _draw_transitions(g, current, writeln):
     # FIXME: find a graphing library. I could find only perls
     # Graph::Easy
-
     assert current != g.exit_state \
     , "Can not have a transition from exit state"
 
@@ -134,7 +135,10 @@ class Graph(nx.DiGraph):
       return out
 
     def indent(len_, xs):
-      return "\n".join([" " * len_ + x for x in xs.splitlines()])
+      return "\n".join([
+        " " * (len_ if x.strip() else 0) + x
+        for x in xs.splitlines()
+      ])
 
     states = list(set(range(1, len(mm))) - set([current])) + [0]
 

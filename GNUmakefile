@@ -6,6 +6,7 @@ DOCDIR = ./Documentation
 DOCMAKE = $(MAKE) -C $(DOCDIR)
 
 TESTDIR = ./tests
+CRAMTESTS = $(shell find $(TESTDIR)/cram/ -type f -name '*.t')
 
 build:
 
@@ -20,6 +21,14 @@ clean:
 	$(DOCMAKE) clean
 
 .PHONY: check
-check:
+check: pytest cram
+
+.PHONY: pytest
+pytest:
 
 	python $(shell which py.test) -v --doctest-modules $(PKGNAME) $(TESTDIR)
+
+.PHONY: cram
+cram:
+
+	cram --shell=/bin/zsh $(CRAMTESTS)

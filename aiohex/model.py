@@ -49,6 +49,10 @@ def connect(dsn):
 class DSN(str):
   """
   Postgresql Connection URI. See https://www.postgresql.org/docs/9.4/static/libpq-connect.html#AEN41223
+
+  .. todo::
+
+    raise ValueError on invalid input
   """
 
 async def register_hit(engine, page_no, session_id, ip, socket, headers):

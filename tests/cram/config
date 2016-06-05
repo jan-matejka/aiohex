@@ -1,0 +1,3 @@
+[core]
+dsn   = non-empty to bypass validation check
+model = fixture
