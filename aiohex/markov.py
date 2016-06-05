@@ -82,11 +82,14 @@ class Graph(nx.DiGraph):
 
     return mm
 
-  def draw_transitions(g, current, writeln = print):
+  def draw_transitions(g, writeln = print):
     """
-    Draws transitions from `current` in the form of ASCII block
-    diagram.
+    Draws transitions in the form of ASCII block diagram.
     """
+    for i in range(1, g.size):
+      g._draw_transitions(i, writeln)
+
+  def _draw_transitions(g, current, writeln):
     # FIXME: find a graphing library. I could find only perls
     # Graph::Easy
 

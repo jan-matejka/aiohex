@@ -102,6 +102,20 @@ async def get_transitions(engine, exit_state = None):
 
   return _hits_to_graphs(xs, exit_state)
 
+async def get_sessions(engine):
+  """
+  :rtype: [UUID]
+  """
+  q = sql.Select([
+    hits.c.session_id
+  , sql.functions.count().label("hits")
+  ]) \
+  .group_by(hits.c.session_id) \
+  .order_by(sql.functions.max(hits.c.id).desc())
+
+  async with engine.acquire() as conn:
+    return await conn.execute(q)
+
 def _hits_to_graphs(xs, exit_state):
   """
   :param xs: [(page_id, session_id)]

@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import itertools
 import sys
+import uuid
 
 from aiohttp import web
 
@@ -89,23 +90,32 @@ def main():
   p = argparse.ArgumentParser(description = 'Example aiohttp web app')
   sub = p.add_subparsers(dest = 'command')
   sub.add_parser("serve", help = serve.__doc__)
-  sub.add_parser("transitions", help = transitions.__doc__)
+
+  tp = sub.add_parser("transitions", help = transitions.__doc__)
+  tp.add_argument("--session-id", type = uuid.UUID
+  , help = "Show transitions for given session-id only"
+  )
+
+  sub.add_parser("sessions", help = sessions.__doc__)
 
   args = p.parse_args(sys.argv[1:])
 
   dispatch = dict(
     serve       = serve
   , transitions = transitions
+  , sessions    = sessions
   )
 
-  sys.exit(dispatch[args.command](args))
+  sys.exit(dispatch[args.command](
+    args
+  , asyncio.get_event_loop()
+  , Config()
+  ))
 
-def serve(args):
+def serve(args, _, c):
   """
   Start HTTP server
   """
-  c = Config()
-
   # setup session management
   app = web.Application(middlewares = [
     session.create_middleware_factory(c.create_cookie_config())
@@ -120,20 +130,53 @@ def serve(args):
   web.run_app(app)
   return 0
 
-def transitions(args):
+def transitions(args, loop, c):
   """
   Display page transitions graph
   """
-  c = Config()
   e = model.connect(c.dsn)
 
   exit_state = 0
-  tgs = asyncio.get_event_loop().run_until_complete(
+  tgs = loop.run_until_complete(
     model.get_transitions(e, exit_state)
   )
 
-  for sid, tg in tgs.items():
-    print("Transitions for session {}:".format(sid))
+  if args.session_id:
+    if args.session_id not in tgs:
+      print("Unknown session {}".format(args.session_id))
+      return 1
+
+    tg = tgs[args.session_id]
     tg.compute_probabilities()
-    for i in range(1,4):
-      tg.draw_transitions(i)
+
+    print("Transitions for session {}:\n".format(args.session_id))
+    tg.draw_transitions()
+
+  else:
+    g = markov.Graph(flatten(
+      [x.edges(data = True) for x in tgs.values()]
+    ))
+    g.compute_probabilities()
+
+    print("Aggregated transitions:\n")
+    g.draw_transitions()
+
+def sessions(args, loop, c):
+  """
+  List sessions in descending order by time of latest hit.
+  """
+  xs = loop.run_until_complete(
+    model.get_sessions(model.connect(c.dsn))
+  )
+  print("{0:<38} {1}".format("Session id", "Total Hits"))
+  for x in xs:
+    print("{}   {}".format(x.session_id, x.hits))
+
+def flatten(xs):
+  """
+  The flat part of flatMap
+
+  :type xs: [[object]]
+  :rtype: [object]
+  """
+  return [y for x in xs for y in x]
