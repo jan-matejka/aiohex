@@ -27,7 +27,7 @@ Test the markov graph probability computation and drawing
   
   $ aiohex transitions
   Aggregated transitions:
-
+  
   +---+                    +------+
   | 1 | ---  50 % --->     | exit |
   +---+                    +------+
@@ -40,7 +40,7 @@ Test the markov graph probability computation and drawing
         ---  25 % --->     | 2 |
                            +---+
   +---+                    +---+
-  | 2 | ---  66 % --->     | 3 |
+  | 2 | ---  67 % --->     | 3 |
   +---+                    +---+
   
                            +---+
@@ -48,11 +48,10 @@ Test the markov graph probability computation and drawing
                            +---+
   
   +---+                    +---+
-  | 3 | ---  20 % --->     | 2 |
+  | 3 | ---  40 % --->     | 1 |
   +---+                    +---+
   
                            +---+
-        ---  40 % --->     | 1 |
+        ---  20 % --->     | 2 |
                            +---+
-  
   

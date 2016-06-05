@@ -208,9 +208,9 @@ def transitions(args, loop, c, model):
     tg.draw_transitions()
 
   else:
-    g = markov.Graph(flatten(
-      [x.edges(data = True) for x in tgs.values()]
-    ))
+    g = markov.Graph()
+    for tg in tgs.values():
+      g.add_weights(tg)
     g.compute_probabilities()
 
     print("Aggregated transitions:\n")

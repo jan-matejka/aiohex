@@ -39,7 +39,7 @@ class Graph(nx.DiGraph):
     totals = dict([(x, 0) for x in g.nodes()])
 
     for u, v in g.edges_iter():
-      totals[u] += 1
+      totals[u] += g[u][v]['weight']
 
     for u, v in g.edges_iter():
       g[u][v]['probability'] = g[u][v]['weight'] / float(totals[u])
@@ -49,7 +49,7 @@ class Graph(nx.DiGraph):
     # http://stackoverflow.com/questions/15590812/networkx-convert-multigraph-into-simple-graph-with-weighted-edges
     g = cls()
     for u, v, data in mdg.edges_iter(data = True):
-        if g.has_edge(u,v):
+        if g.has_edge(u, v):
           g[u][v]['weight'] += 1
         else:
           g.add_edge(u, v, weight=1)
@@ -59,6 +59,20 @@ class Graph(nx.DiGraph):
   @classmethod
   def from_edges(cls, xs):
     return cls.from_multidigraph(nx.MultiDiGraph(xs))
+
+  def add_weights(g, g2):
+    """
+    Adds weights from `g2` to self.
+    All nodes in g2 must have weights.
+
+    :param g2:
+    :type  g2: nx.Graph
+    """
+    for u, v, data in g2.edges_iter(data = True):
+      if not g.has_edge(u, v):
+        g.add_edge(u, v, weight = 0)
+
+      g[u][v]['weight'] += data['weight']
 
   @property
   def size(g):
@@ -93,7 +107,9 @@ class Graph(nx.DiGraph):
 
   def _draw_transitions(g, current, writeln):
     # FIXME: find a graphing library. I could find only perls
-    # Graph::Easy
+    # Graph::Easy.
+    # Turns out networkx can draw the graphs via matplotlib or
+    # graphviz so an ascii graphing/converting could work from that
     assert current != g.exit_state \
     , "Can not have a transition from exit state"
 
