@@ -97,7 +97,6 @@ async def get_transitions(engine, exit_state = None):
   :returns: dict(session_id = transition_graph)
   :rtype: dict(UUID = markov.Graph]
   """
-  # TODO: namedtuple
   q = sql.Select([hits.c.page_no, hits.c.session_id]) \
     .order_by(hits.c.session_id, hits.c.id)
 

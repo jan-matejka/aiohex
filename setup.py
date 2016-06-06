@@ -10,7 +10,7 @@ setup(
 , description  = 'aiohttp example'
 , author       = 'Jan Matějka'
 , author_email = 'yac@blesmrt.net'
-# ,  url=''
+, url          = 'https://github.com/yaccz/aiohex'
 
 , packages = find_packages(
     where = '.'
@@ -23,6 +23,7 @@ setup(
   , "sqlalchemy"
   , "networkx"
   , "numpy"
+  , "pyxdg"
   ]
 
 , tests_require = [
