@@ -74,6 +74,12 @@ class Config:
   :param session_cookie_name:
   :type  session_cookie_name: str
 
+  :param ip: ip to bind to
+  :type  ip: str
+
+  :param port: port to bind to
+  :type  port: int
+
   :param model: Database model to use. Relevant only to self-tests.
   """
 
@@ -103,6 +109,9 @@ class Config:
       'session_cookie_name'
     , 'AIOHEX_ID'
     )
+
+    c.ip   = core.setdefault('ip', '127.0.0.1')
+    c.port = cp.getint('core', 'port', fallback = 8080)
 
     c._model = core.setdefault('model', 'actual')
     if c._model not in c._models.keys():
@@ -181,7 +190,7 @@ def serve(args, _, c, model):
   c.forget_dsn()
 
   # run
-  web.run_app(app)
+  web.run_app(app, host = c.ip, port = c.port)
   return 0
 
 def transitions(args, loop, c, model):
