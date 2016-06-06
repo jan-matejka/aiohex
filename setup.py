@@ -34,7 +34,7 @@ setup(
   ]
 
 , entry_points = {
-    'console_scripts': ['aiohex = aiohex:main']
+    'console_scripts': ['aiohex = aiohex.core:main']
   }
 
 , classifiers = [
